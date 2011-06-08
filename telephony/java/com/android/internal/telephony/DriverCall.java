@@ -108,11 +108,13 @@ public class DriverCall implements Comparable {
                 + "toa=" + TOA + ","
                 + (isMpty ? "conf" : "norm") + ","
                 + (isMT ? "mt" : "mo") + ","
-                + als + ","
+                + "als=" + als + ","
                 + (isVoice ? "voc" : "nonvoc") + ","
-                + (isVoicePrivacy ? "evp" : "noevp") + ","
-                /*+ "number=" + number */ + ",cli=" + numberPresentation + ","
-                /*+ "name="+ name */ + "," + namePresentation;
+                + "nonvid" + ","
+                + number + ","
+                + "cli=" + numberPresentation + ","
+                + "name=" + name + ","
+                + namePresentation;
     }
 
     public static State

@@ -365,13 +365,13 @@ final class CdmaServiceStateTracker extends ServiceStateTracker {
                 if (states.length > 9) {
                     try {
                         if (states[4] != null) {
-                            baseStationId = Integer.parseInt(states[4]);
+                            baseStationId = Integer.parseInt(states[4], 16);
                         }
                         if (states[5] != null) {
-                            baseStationLatitude = Integer.parseInt(states[5]);
+                            baseStationLatitude = Integer.parseInt(states[5], 16);
                         }
                         if (states[6] != null) {
-                            baseStationLongitude = Integer.parseInt(states[6]);
+                            baseStationLongitude = Integer.parseInt(states[6], 16);
                         }
                         // Some carriers only return lat-lngs of 0,0
                         if (baseStationLatitude == 0 && baseStationLongitude == 0) {
@@ -410,7 +410,7 @@ final class CdmaServiceStateTracker extends ServiceStateTracker {
 
             if (ar.exception == null) {
                 String cdmaSubscription[] = (String[])ar.result;
-                if (cdmaSubscription != null && cdmaSubscription.length >= 5) {
+                if (cdmaSubscription != null && cdmaSubscription.length >= 4) {
                     mMdn = cdmaSubscription[0];
                     if (cdmaSubscription[1] != null) {
                         String[] sid = cdmaSubscription[1].split(",");
@@ -438,7 +438,8 @@ final class CdmaServiceStateTracker extends ServiceStateTracker {
                     }
                     Log.d(LOG_TAG,"GET_CDMA_SUBSCRIPTION NID=" + cdmaSubscription[2] );
                     mMin = cdmaSubscription[3];
-                    mPrlVersion = cdmaSubscription[4];
+                    String[] prl = (SystemProperties.get("ril.prl_ver_1").split(":"));
+                    mPrlVersion = prl[1];
                     Log.d(LOG_TAG,"GET_CDMA_SUBSCRIPTION MDN=" + mMdn);
                     //Notify apps subscription info is ready
                     if (cdmaForSubscriptionInfoReadyRegistrants != null) {
@@ -709,13 +710,13 @@ final class CdmaServiceStateTracker extends ServiceStateTracker {
                             radioTechnology = Integer.parseInt(states[3]);
                         }
                         if (states[4] != null) {
-                            baseStationId = Integer.parseInt(states[4]);
+                            baseStationId = Integer.parseInt(states[4], 16);
                         }
                         if (states[5] != null) {
-                            baseStationLatitude = Integer.parseInt(states[5]);
+                            baseStationLatitude = Integer.parseInt(states[5], 16);
                         }
                         if (states[6] != null) {
-                            baseStationLongitude = Integer.parseInt(states[6]);
+                            baseStationLongitude = Integer.parseInt(states[6], 16);
                         }
                         // Some carriers only return lat-lngs of 0,0
                         if (baseStationLatitude == 0 && baseStationLongitude == 0) {
@@ -1106,7 +1107,8 @@ final class CdmaServiceStateTracker extends ServiceStateTracker {
             if (operatorNumeric == null) {
                 phone.setSystemProperty(TelephonyProperties.PROPERTY_OPERATOR_ISO_COUNTRY, "");
             } else {
-                String isoCountryCode = "";
+                String isoCountryCode = "us";
+/*
                 try{
                     isoCountryCode = MccTable.countryCodeForMcc(Integer.parseInt(
                             operatorNumeric.substring(0,3)));
@@ -1115,7 +1117,7 @@ final class CdmaServiceStateTracker extends ServiceStateTracker {
                 } catch ( StringIndexOutOfBoundsException ex) {
                     Log.w(LOG_TAG, "countryCodeForMcc error" + ex);
                 }
-
+*/
                 phone.setSystemProperty(TelephonyProperties.PROPERTY_OPERATOR_ISO_COUNTRY,
                         isoCountryCode);
                 mGotCountryCode = true;
@@ -1226,11 +1228,11 @@ final class CdmaServiceStateTracker extends ServiceStateTracker {
         } else {
             int[] ints = (int[])ar.result;
             int offset = 2;
-            int cdmaDbm = (ints[offset] > 0) ? -ints[offset] : -120;
+            int cdmaDbm = (ints[0] > 0 ) ? -ints[0] : -120;
             int cdmaEcio = (ints[offset+1] > 0) ? -ints[offset+1] : -160;
             int evdoRssi = (ints[offset+2] > 0) ? -ints[offset+2] : -120;
             int evdoEcio = (ints[offset+3] > 0) ? -ints[offset+3] : -1;
-            int evdoSnr  = ((ints[offset+4] > 0) && (ints[offset+4] <= 8)) ? ints[offset+4] : -1;
+            int evdoSnr = ((ints[offset+4] > 0) && (ints[offset+4] <= 8)) ? ints[offset+4] : -1;
 
             //log(String.format("onSignalStrengthResult cdmaDbm=%d cdmaEcio=%d evdoRssi=%d evdoEcio=%d evdoSnr=%d",
             //        cdmaDbm, cdmaEcio, evdoRssi, evdoEcio, evdoSnr));

@@ -382,6 +382,7 @@ public final class CdmaDataConnectionTracker extends DataConnectionTracker {
         }
 
         setState(State.DISCONNECTING);
+        SystemProperties.set("ril.cdma.data_ready", "false");
 
         boolean notificationDeferred = false;
         for (DataConnection conn : dataConnectionList) {

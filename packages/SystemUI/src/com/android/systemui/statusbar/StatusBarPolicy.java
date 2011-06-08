@@ -1138,14 +1138,20 @@ public class StatusBarPolicy {
             // If 3G(EV) and 1x network are available than 3G should be
             // displayed, displayed RSSI should be from the EV side.
             // If a voice call is made then RSSI should switch to 1x.
-            if ((mPhoneState == TelephonyManager.CALL_STATE_IDLE) && isEvdo()){
+            /*if ((mPhoneState == TelephonyManager.CALL_STATE_IDLE) && isEvdo()){
                 iconLevel = getEvdoLevel();
                 if (false) {
                     Slog.d(TAG, "use Evdo level=" + iconLevel + " to replace Cdma Level=" + getCdmaLevel());
                 }
             } else {
                 iconLevel = getCdmaLevel();
-            }
+            }*/
+            final int cdmaDbm = mSignalStrength.getCdmaDbm();
+            if (cdmaDbm >= -75) iconLevel = 4;
+            else if (cdmaDbm >= -85) iconLevel = 3;
+            else if (cdmaDbm >= -95) iconLevel = 2;
+            else if (cdmaDbm >= -100) iconLevel = 1;
+            else iconLevel = 0;
         }
         mPhoneSignalIconId = iconList[iconLevel];
         mService.setIcon("phone_signal", mPhoneSignalIconId, 0);

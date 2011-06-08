@@ -444,6 +444,7 @@ public abstract class DataConnection extends HierarchicalStateMachine {
             }
         }
 
+        SystemProperties.set("ril.cdma.data_ready", "true");
         if (DBG) log("DataConnection setup result='" + result + "' on cid=" + cid);
         return result;
     }
