@@ -44,6 +44,8 @@
 #include "gralloc_priv.h"
 #endif
 
+#include <cutils/properties.h>
+
 namespace android {
 
 // ----------------------------------------------------------------------------
@@ -224,6 +226,14 @@ sp<ICamera> CameraService::connect(
 
     CameraInfo info;
     HAL_getCameraInfo(cameraId, &info);
+
+    /* If the FFC claims standard back-facing orientation,
+     * treat it as such. This avoid all the mirroring and rotation
+     * hooks */
+    if (info.facing == CAMERA_FACING_FRONT && info.orientation == 90) {
+        info.facing = CAMERA_FACING_BACK;
+    }
+
     client = new Client(this, cameraClient, hardware, cameraId, info.facing,
                         callingPid);
     mClient[cameraId] = client;
@@ -336,8 +346,18 @@ void CameraService::loadSound() {
     LOG1("CameraService::loadSound ref=%d", mSoundRef);
     if (mSoundRef++) return;
 
-    mSoundPlayer[SOUND_SHUTTER] = newMediaPlayer("/system/media/audio/ui/camera_click.ogg");
-    mSoundPlayer[SOUND_RECORDING] = newMediaPlayer("/system/media/audio/ui/VideoRecord.ogg");
+    char value[PROPERTY_VALUE_MAX];
+    property_get("persist.camera.shutter.disable", value, "0");
+    int disableSound = atoi(value);
+
+    if(!disableSound) {
+        mSoundPlayer[SOUND_SHUTTER] = newMediaPlayer("/system/media/audio/ui/camera_click.ogg");
+        mSoundPlayer[SOUND_RECORDING] = newMediaPlayer("/system/media/audio/ui/VideoRecord.ogg");
+    }
+    else {
+        mSoundPlayer[SOUND_SHUTTER] = NULL;
+        mSoundPlayer[SOUND_RECORDING] = NULL;
+    }
 }
 
 void CameraService::releaseSound() {
